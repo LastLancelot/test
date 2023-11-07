@@ -37,9 +37,6 @@ export class AuthGuard implements CanActivate {
       if (!founded) {
         return false;
       }
-      if (payload.exp >= new Date().getTime()) {
-        throw new UnauthorizedException();
-      }
       request['user'] = payload;
     } catch (e) {
       console.log(e);

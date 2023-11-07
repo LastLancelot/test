@@ -112,8 +112,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('JWT-auth')
   @Post('/check')
-  async checkToken(@Req() req: Request) {
-    const header: any = req.headers;
-    return this.refreshService.validate(header.refreshtoken, {});
+  async checkToken() {
+    return true;
   }
 }

@@ -5,6 +5,7 @@ export type UserDocument = Csv & Document;
 
 @Schema()
 export class Csv {
+  _id: string;
   @Prop({
     type: mongoose.Schema.ObjectId,
     ref: Csv.name,
@@ -14,20 +15,24 @@ export class Csv {
   @ApiProperty()
   @Prop({
     required: true,
-    name: 'phoneNumber',
+    unique: true,
   })
   phoneNumber: string;
   @ApiProperty()
-  @Prop()
+  @Prop({ required: false })
   firstName: string;
 
   @ApiProperty()
-  @Prop()
+  @Prop({ required: false })
   lastName: string;
 
   @ApiProperty()
-  @Prop()
-  fullName: string;
+  @Prop({ required: true })
+  listTag: string[];
+
+  @ApiProperty()
+  @Prop({ required: false })
+  carrier: string;
 }
 
 export const CsvSchema = SchemaFactory.createForClass(Csv);
