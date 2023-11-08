@@ -16,7 +16,7 @@ export class CsvService {
 
   async readFile(fileName: string) {
     const data: CsvInsertDto[] = [];
-    const phones: string[] = ['phone'];
+    const phones = new Set();
     let countOfDuplicateInFile: number = 0;
     const model = this.csvModel;
     let badCounter = 0;
@@ -33,6 +33,8 @@ export class CsvService {
           .on('data', async function (row) {
             const validPhone = phone(row[0]);
             if (await validPhone.isValid) {
+              const phonesSize = phones.size;
+              phones.add(row[0]);
               row[0] = validPhone.phoneNumber;
               const element: CsvInsertDto = {
                 phoneNumber: row[0],
@@ -41,19 +43,18 @@ export class CsvService {
                 carrier: row[4] ? row[4] : null,
                 listTag: fileName,
               };
-              const phone = phones.find((element) => element === row[0]);
-              if (phone) {
-                countOfDuplicateInFile += 1;
-              } else {
+              if (phonesSize !== phones.size) {
                 data.push(element);
+              } else {
+                countOfDuplicateInFile += 1;
               }
             } else {
               badCounter += 1;
             }
-            phones.push(row[0]);
           })
           .on('end', async function () {
             console.log('Data has been readed');
+
             let dublicateInMongo: number = 0;
             try {
               await model.insertMany(data, {
@@ -67,7 +68,6 @@ export class CsvService {
                   },
                 );
                 dublicateInMongo = await csvIds.length;
-                console.log(dublicateInMongo);
                 await model.updateMany(
                   { phoneNumber: { $in: csvIds } },
                   { $push: { listTag: fileName } },
